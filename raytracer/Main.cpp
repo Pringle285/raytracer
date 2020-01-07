@@ -11,7 +11,10 @@
 
 #include <iostream>
 
-void doStuff(glm::ivec2 windowSize, std::shared_ptr<Camera> camera);
+#include <thread>
+#include <mutex>
+
+void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera> camera);
 
 int main( int argc, char *argv[] )
 {
@@ -45,11 +48,14 @@ int main( int argc, char *argv[] )
 	
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
 	int threadCount = 1; 
-	for (int i = 0; i < windowSize.x; i += (windowSize.x / threadCount))
+	std::vector<std::thread> threadVector; 
+	for (int i = 0; i <= windowSize.x; i += (windowSize.x / threadCount))
 	{
-
+		//create a number of threads to deal with each screen width
+		threadVector.push_back(std::thread(doStuff, i, i + (windowSize.x/threadCount), camera));
+		std::cout << "newthread" << std::endl;
 	}
-	doStuff(windowSize, camera);
+	//doStuff(1, 1, windowSize, camera);
 
 	/*std::shared_ptr<Camera> camera = std::make_shared<Camera>(); 
 	
@@ -115,10 +121,10 @@ int main( int argc, char *argv[] )
 }
 
 
-void doStuff(glm::ivec2 windowSize, std::shared_ptr<Camera> camera)
+void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera> camera)
 {
 	
-
+	std::mutex mutex;
 	for (int screenX = 0; screenX < windowSize.x; screenX++)
 	{
 		for (int screenY = 0; screenY < windowSize.y; screenY++)
@@ -130,8 +136,9 @@ void doStuff(glm::ivec2 windowSize, std::shared_ptr<Camera> camera)
 			std::shared_ptr<Tracer> tracer = std::make_shared<Tracer>();
 			glm::vec3 pixelColor = tracer->traceRay(ray);
 			//std::cout << ray->getOrigin().x << " " << ray->getOrigin().y << std::endl;
-
+			mutex.lock();
 			MCG::DrawPixel(currentPixel, pixelColor);
+			mutex.unlock();
 		}
 	}
 }
