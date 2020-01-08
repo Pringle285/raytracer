@@ -16,6 +16,8 @@
 
 void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera> camera);
 
+std::mutex mutex;
+
 int main( int argc, char *argv[] )
 {
 	// Variable for storing window dimensions
@@ -45,40 +47,27 @@ int main( int argc, char *argv[] )
 
 	// Draws a single pixel at the specified coordinates in the specified colour!
 	//MCG::DrawPixel( pixelPosition, pixelColour );
-	
+	std::shared_ptr<std::mutex> mutex;
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
 	int threadCount = 1; 
 	std::vector<std::thread> threadVector; 
-	for (int i = 0; i <= windowSize.x; i += (windowSize.x / threadCount))
+	for (int i = 0; i < windowSize.x; i += (windowSize.x / threadCount))
 	{
-		//create a number of threads to deal with each screen width
-		threadVector.push_back(std::thread(doStuff, i, i + (windowSize.x/threadCount), camera));
+		//create a number of threads to deal with each screen width	
+		int tempInt = i + (windowSize.x / threadCount);
+		threadVector.push_back(std::thread(doStuff, i, tempInt, windowSize, camera));
 		std::cout << "newthread" << std::endl;
 	}
-	//doStuff(1, 1, windowSize, camera);
-
-	/*std::shared_ptr<Camera> camera = std::make_shared<Camera>(); 
-	
-	for (int screenX = 0; screenX < windowSize.x; screenX++)
+	for (std::vector<std::thread>::iterator it = threadVector.begin(); it != threadVector.end(); it++)
 	{
-		for (int screenY = 0; screenY < windowSize.y; screenY++)
-		{
-			//looping all onscreen pixels, act on pixels here
-			glm::ivec2 currentPixel = glm::ivec2(screenX, screenY);
-			std::shared_ptr<Ray> ray = camera->returnRay(currentPixel);
-			//std::cout << screenX << " " << screenY << std::endl;
-			std::shared_ptr<Tracer> tracer = std::make_shared<Tracer>();
-			glm::vec3 pixelColor = tracer->traceRay(ray);
-			//std::cout << ray->getOrigin().x << " " << ray->getOrigin().y << std::endl;
-
-			MCG::DrawPixel(currentPixel, pixelColor);
-		}
-	}*/
+		std::cout << "test" << std::endl;
+		it->join();
+	}
 
 
 
 
-
+	std::cout << "OUTPUT" << std::endl;
 
 	// Do any other DrawPixel calls here
 	// ...
@@ -88,7 +77,7 @@ int main( int argc, char *argv[] )
 	// Program will exit after this line
 	return MCG::ShowAndHold();
 
-
+	std::cout << "OUTPUT" << std::endl;
 
 
 
@@ -124,6 +113,28 @@ int main( int argc, char *argv[] )
 void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera> camera)
 {
 	
+	
+	for (int screenX = startX; screenX < endX; screenX++)
+	{
+		for (int screenY = 0; screenY < windowSize.y; screenY++)
+		{
+			//looping all onscreen pixels, act on pixels here
+			glm::ivec2 currentPixel = glm::ivec2(screenX, screenY);
+			std::shared_ptr<Ray> ray = camera->returnRay(currentPixel);
+			//std::cout << screenX << " " << screenY << std::endl;
+			std::shared_ptr<Tracer> tracer = std::make_shared<Tracer>();
+			glm::vec3 pixelColor = tracer->traceRay(ray);
+			//std::cout << ray->getOrigin().x << " " << ray->getOrigin().y << std::endl;
+			mutex.lock();
+			MCG::DrawPixel(currentPixel, pixelColor);
+			mutex.unlock();
+		}
+	}
+}
+
+/*void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera> camera)
+{
+
 	std::mutex mutex;
 	for (int screenX = 0; screenX < windowSize.x; screenX++)
 	{
@@ -141,4 +152,4 @@ void doStuff(int startX, int endX, glm::ivec2 windowSize, std::shared_ptr<Camera
 			mutex.unlock();
 		}
 	}
-}
+}*/
