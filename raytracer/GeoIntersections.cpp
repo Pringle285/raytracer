@@ -49,6 +49,15 @@ std::shared_ptr<RaySphereDetails> GeoIntersections::raySphereIntersection(std::s
 		float dist = (glm::dot(sphereCentre - ray->getOrigin(), ray->getDirection()) - x);
 
 		details->distanceToHit = dist;
+
+		glm::vec3 intersectNormal;
+		intersectNormal = closeIntersectionPoint - sphereCentre;
+		intersectNormal = glm::normalize(intersectNormal);
+		details->surfaceNormal = intersectNormal;
+
+		
+		
+
 	}
 	else
 	{

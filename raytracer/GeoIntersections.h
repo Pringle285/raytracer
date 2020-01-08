@@ -7,6 +7,7 @@ struct RaySphereDetails
 {
 	bool intersected;
 	float distanceToHit;
+	glm::vec3 surfaceNormal; 
 };
 
 

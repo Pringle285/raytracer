@@ -49,7 +49,7 @@ int main( int argc, char *argv[] )
 	//MCG::DrawPixel( pixelPosition, pixelColour );
 	std::shared_ptr<std::mutex> mutex;
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
-	int threadCount = 1; 
+	int threadCount = 10; 
 	std::vector<std::thread> threadVector; 
 	for (int i = 0; i < windowSize.x; i += (windowSize.x / threadCount))
 	{
