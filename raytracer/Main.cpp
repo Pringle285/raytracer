@@ -49,18 +49,18 @@ int main( int argc, char *argv[] )
 	//MCG::DrawPixel( pixelPosition, pixelColour );
 	std::shared_ptr<std::mutex> mutex;
 	std::shared_ptr<Camera> camera = std::make_shared<Camera>();
-	int threadCount = 10; 
+	int threadCount = 5; 
 	std::vector<std::thread> threadVector; 
 	for (int i = 0; i < windowSize.x; i += (windowSize.x / threadCount))
 	{
 		//create a number of threads to deal with each screen width	
 		int tempInt = i + (windowSize.x / threadCount);
 		threadVector.push_back(std::thread(doStuff, i, tempInt, windowSize, camera));
-		std::cout << "newthread" << std::endl;
+		//std::cout << "newthread" << std::endl;
 	}
 	for (std::vector<std::thread>::iterator it = threadVector.begin(); it != threadVector.end(); it++)
 	{
-		std::cout << "test" << std::endl;
+		//std::cout << "test" << std::endl;
 		it->join();
 	}
 
